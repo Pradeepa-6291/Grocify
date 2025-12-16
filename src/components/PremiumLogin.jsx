@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../utils/api';
 
 export default function PremiumLogin() {
   const [formData, setFormData] = useState({
@@ -21,19 +22,46 @@ export default function PremiumLogin() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.email && formData.password) {
-      const userData = {
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        address: formData.address,
-        pincode: formData.pincode
-      };
-      localStorage.setItem('user', JSON.stringify(userData));
-      navigate('/');
+    
+    try {
+      let response;
+      
+      if (isLogin) {
+        // Login existing user
+        console.log('Attempting login with:', { email: formData.email });
+        response = await api.loginUser({
+          email: formData.email,
+          password: formData.password
+        });
+        console.log('Login response:', response);
+      } else {
+        // Register new user
+        console.log('Attempting registration with:', { email: formData.email, firstName: formData.firstName });
+        response = await api.registerUser({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          address: formData.address,
+          pincode: formData.pincode
+        });
+        console.log('Registration response:', response);
+      }
+      
+      if (response && response.token) {
+        localStorage.setItem('user', JSON.stringify(response));
+        localStorage.setItem('token', response.token);
+        alert(isLogin ? 'Login successful!' : 'Registration successful!');
+        navigate('/');
+      } else {
+        alert('Authentication failed. Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      alert(error.message || 'Authentication failed. Please try again.');
     }
   };
 

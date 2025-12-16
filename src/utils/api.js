@@ -1,91 +1,146 @@
+const API_BASE_URL = 'http://localhost:5000/api';
+
+// Test backend connectivity
+const testBackend = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/test`);
+    const data = await response.json();
+    console.log('✅ Backend test:', data);
+    return true;
+  } catch (error) {
+    console.error('❌ Backend connection failed:', error);
+    return false;
+  }
+};
+
+// API utility functions
+const api = {
+  // Test connection
+  testConnection: testBackend,
+  // Products
+  async getProducts() {
+    const response = await fetch(`${API_BASE_URL}/products`);
+    return response.json();
+  },
+
+  async getProductById(id) {
+    const response = await fetch(`${API_BASE_URL}/products/${id}`);
+    return response.json();
+  },
+
+  async createProduct(productData) {
+    const response = await fetch(`${API_BASE_URL}/products`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(productData),
+    });
+    return response.json();
+  },
+
+  // Users
+  async registerUser(userData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+      return data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
+  },
+
+  async loginUser(credentials) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  },
+
+  // Orders
+  async createOrder(orderData, token) {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+    return response.json();
+  },
+
+  async getUserOrders(token) {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  }
+};
+
+// Default products for fallback
 export const products = [
-  { 
-    id: 1, 
-    name: "Dairy Milk Chocolate", 
-    price: 80, 
-    description: "Smooth and creamy milk chocolate.", 
-    offer: "10% OFF", 
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKDK_G4KwlqOWOSOWug8GxwSS58PiWUv0I2Q&s", 
-    category: "chocolate" 
+  {
+    id: 1,
+    name: "Premium Dark Chocolate Bar",
+    description: "Rich, smooth dark chocolate with 70% cocoa content.",
+    price: 299,
+    category: "chocolate",
+    image: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=300&h=200&fit=crop",
+    offer: "25% OFF"
   },
-
-  { 
-    id: 2, 
-    name: "KitKat", 
-    price: 50, 
-    description: "Crispy wafer coated with chocolate.", 
-    offer: "5% OFF", 
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZEW0hfQz8AiVD25vW58sF5l880Vw2CfZR_Q&s", 
-    category: "chocolate" 
+  {
+    id: 2,
+    name: "Instant Ramen Noodles Pack",
+    description: "Quick and delicious instant noodles with authentic Asian flavors.",
+    price: 45,
+    category: "noodles",
+    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=300&h=200&fit=crop",
+    offer: "Buy 2 Get 1"
   },
-
-  { 
-    id: 3, 
-    name: "Maggi Noodles", 
-    price: 14, 
-    description: "2-minute instant noodles.", 
-    offer: "15% OFF", 
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDso3eD2Aurqw7kYact-OHWwX-nHvP1vMT9g&s", 
-    category: "noodles" 
+  {
+    id: 3,
+    name: "Italian Penne Pasta",
+    description: "Authentic Italian durum wheat pasta.",
+    price: 180,
+    category: "pasta",
+    image: "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=300&h=200&fit=crop",
+    offer: "15% OFF"
   },
-
-  { 
-    id: 4, 
-    name: "Top Ramen", 
-    price: 20, 
-    description: "Masala noodles pack.", 
-    offer: "10% OFF", 
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMXyyXoOdwgMvgi4W4ZHVQwDGVDV4msr1Lqg&s", 
-    category: "noodles" 
-  },
-
-  { 
-    id: 5, 
-    name: "Pasta Packet", 
-    price: 45, 
-    description: "Italian style raw pasta.", 
-    offer: "12% OFF", 
-    image: "https://www.mortonindia.com/wp-content/uploads/2022/01/1-14.jpg", 
-    category: "pasta" 
-  },
-
-  { 
-    id: 6, 
-    name: "Sunfeast Dark Fantasy", 
-    price: 40, 
-    description: "Chocolate-filled cookies.", 
-    offer: "8% OFF", 
-    image: "https://rukminim2.flixcart.com/image/480/480/cms-rpd-images/a42ec455bd4940c29ce964ae217a6504_17ccc4f3f59_CKBFUQFEF55PGRSE_ImageMediaWidget_1.jpg.jpeg?q=90", 
-    category: "snacks" 
-  },
-
-  { 
-    id: 7, 
-    name: "Oreos", 
-    price: 35, 
-    description: "Crunchy cookies with vanilla cream.", 
-    offer: "10% OFF", 
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlEJ7hOmLoviSOc4c9xmtHKy4LOov_QJAJpg&s", 
-    category: "snacks" 
-  },
-
-  { 
-    id: 8, 
-    name: "Toblerone", 
-    price: 120, 
-    description: "Swiss triangular chocolate.", 
-    offer: "20% OFF", 
-    image: "https://5.imimg.com/data5/SELLER/Default/2025/6/516304849/CT/TF/XX/155289408/toblerone-milk-honey-almond-chocolate-imported.jpeg", 
-    category: "chocolate" 
-  },
-
-  { 
-    id: 10, 
-    name: "Kurkure Masala", 
-    price: 20, 
-    description: "Spicy crunchy snack.", 
-    offer: "10% OFF", 
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt3Fg5m82xp4mmkxk-NaTRmncB2FYnBo76vw&s", 
-    category: "snacks" 
+  {
+    id: 4,
+    name: "Mixed Nuts Premium Pack",
+    description: "A healthy mix of almonds, cashews, and walnuts.",
+    price: 450,
+    category: "snacks",
+    image: "https://images.unsplash.com/photo-1599599810694-57a2ca8276a8?w=300&h=200&fit=crop",
+    offer: "30% OFF"
   }
 ];
+
+export default api;

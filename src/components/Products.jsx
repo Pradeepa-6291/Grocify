@@ -1,5 +1,5 @@
-import React from "react";
-import { products } from "../utils/api";
+import React, { useState, useEffect } from "react";
+import api, { products as fallbackProducts } from "../utils/api";
 import { Link } from "react-router-dom";
 
 const categoryIcons = {
@@ -10,11 +10,40 @@ const categoryIcons = {
 };
 
 export default function Products({setCart,cart}) {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await api.getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error('Failed to load products:', error);
+        setProducts(fallbackProducts);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
+
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
   const categories = [...new Set(products.map(p => p.category))];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-grocify-green mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -73,16 +102,16 @@ export default function Products({setCart,cart}) {
                   
                   <div className="flex gap-3">
                     <Link 
-                      to={`/product/${item.id}`} 
-                      className="flex-1 bg-gradient-to-r from-grocify-orange to-grocify-yellow hover:from-grocify-yellow hover:to-grocify-orange text-white py-3 px-4 rounded-xl font-bold text-center transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-grocify-orange/40 animate-pulse hover:animate-none"
+                      to={`/product/${item._id}`} 
+                      className="flex-1 bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 text-white py-3 px-4 rounded-2xl font-bold text-center transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-blue-400/40"
                     >
-                      👁️ View Details
+                      View Details
                     </Link>
                     <button 
                       onClick={() => addToCart(item)}
-                      className="flex-1 bg-gradient-to-r from-grocify-green to-grocify-teal hover:from-grocify-teal hover:to-grocify-green text-white py-3 px-4 rounded-xl font-bold transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-grocify-green/40 hover:animate-bounce"
+                      className="flex-1 bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 text-white py-3 px-4 rounded-2xl font-bold transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-blue-400/40"
                     >
-                      🛒 Add Cart
+                      ADD TO CART
                     </button>
                   </div>
                 </div>

@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { products } from '../utils/api';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import api from '../utils/api';
 
 export default function OrderPlacement() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = products.find(item => item.id === parseInt(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const user = JSON.parse(localStorage.getItem('user'));
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await api.getProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error('Failed to fetch product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
   
   const [orderData, setOrderData] = useState({
     firstName: user?.firstName || '',
@@ -43,23 +58,48 @@ export default function OrderPlacement() {
     }
   };
 
-  const handleOrderSubmit = (e) => {
+  const handleOrderSubmit = async (e) => {
     e.preventDefault();
-    // Save order to localStorage
-    const order = {
-      id: Date.now(),
-      product,
-      orderData,
-      orderDate: new Date().toISOString(),
-      status: 'Confirmed'
-    };
     
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    existingOrders.push(order);
-    localStorage.setItem('orders', JSON.stringify(existingOrders));
-    
-    setOrderPlaced(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to place order');
+        navigate('/login');
+        return;
+      }
+
+      const orderPayload = {
+        items: [{
+          product: product._id,
+          quantity: 1,
+          price: product.price
+        }],
+        totalAmount: product.price,
+        deliveryAddress: orderData.address,
+        phone: orderData.phone
+      };
+
+      const response = await api.createOrder(orderPayload, token);
+      
+      if (response._id) {
+        setOrderPlaced(true);
+      } else {
+        alert('Failed to place order. Please try again.');
+      }
+    } catch (error) {
+      console.error('Order placement error:', error);
+      alert('Failed to place order. Please try again.');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-grocify-green"></div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -76,24 +116,49 @@ export default function OrderPlacement() {
 
   if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-8">
-        <div className="bg-white rounded-3xl p-12 shadow-2xl text-center max-w-lg">
-          <div className="text-6xl mb-6">🎉</div>
-          <h2 className="text-3xl font-extrabold text-emerald-600 mb-4">Order Placed Successfully!</h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Your order for <strong className="text-gray-900">{product.name}</strong> has been confirmed.
-          </p>
-          <div className="bg-slate-50 rounded-2xl p-6 mb-8 text-left space-y-3">
-            <p className="text-gray-700"><strong>Delivery Address:</strong> {orderData.address}</p>
-            <p className="text-gray-700"><strong>Phone:</strong> {orderData.phone}</p>
-            <p className="text-gray-700"><strong>Expected Delivery:</strong> 30-45 minutes</p>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center p-8">
+        <div className="bg-white rounded-3xl p-12 shadow-2xl text-center max-w-2xl border-4 border-green-200">
+          <div className="text-8xl mb-6 animate-bounce">🎉</div>
+          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-6">
+            Order Placed Successfully!
+          </h2>
+          <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl p-6 mb-8">
+            <p className="text-xl text-gray-700 mb-4">
+              Your order for <strong className="text-green-700">{product.name}</strong> has been confirmed!
+            </p>
+            <div className="text-6xl mb-4">🚚</div>
+            <p className="text-2xl font-bold text-green-600 mb-2">
+              ✨ Will be delivered in 15 minutes! ✨
+            </p>
           </div>
-          <button 
-            onClick={() => navigate('/')} 
-            className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30"
-          >
-            Continue Shopping
-          </button>
+          <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-left space-y-3">
+            <p className="text-gray-700 flex items-center gap-2">
+              <span className="text-xl">📍</span>
+              <strong>Delivery Address:</strong> {orderData.address}
+            </p>
+            <p className="text-gray-700 flex items-center gap-2">
+              <span className="text-xl">📞</span>
+              <strong>Phone:</strong> {orderData.phone}
+            </p>
+            <p className="text-gray-700 flex items-center gap-2">
+              <span className="text-xl">⏰</span>
+              <strong>Expected Delivery:</strong> <span className="text-green-600 font-bold">15 minutes</span>
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <button 
+              onClick={() => navigate('/')} 
+              className="flex-1 bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg"
+            >
+              🏠 Continue Shopping
+            </button>
+            <button 
+              onClick={() => navigate('/products')} 
+              className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg"
+            >
+              🛒 Shop More
+            </button>
+          </div>
         </div>
       </div>
     );

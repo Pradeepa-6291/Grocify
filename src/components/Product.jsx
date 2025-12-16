@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { products } from "../utils/api";
+import api from "../utils/api";
 
 const categoryColors = {
   chocolate: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
@@ -18,7 +18,30 @@ const categoryIcons = {
 
 export default function Product() {
   const { id } = useParams();
-  const product = products.find((item) => item.id === parseInt(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await api.getProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error('Failed to fetch product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-grocify-green"></div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -88,7 +111,7 @@ export default function Product() {
 
               <div className="flex gap-4">
                 <Link 
-                  to={`/buynow/${product.id}`} 
+                  to={`/buynow/${product._id}`} 
                   className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 px-6 rounded-2xl font-bold text-lg text-center hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30"
                 >
                   ⚡ Buy Now
