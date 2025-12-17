@@ -169,7 +169,7 @@ export default function ModernGroceryHome({ cart, setCart }) {
 
       {/* FOOTER */}
       <footer className="bg-gray-100 py-10 text-center text-gray-600">
-        © 2024 GrociFy. All rights reserved.
+        © 2024 GrociFy. All rights reserved contact phone no:88465987225 for any queries.
       </footer>
 
     </div>
