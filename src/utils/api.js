@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://grocify-1-ricx.onrender.com:5000";
+const API_BASE_URL = "https://grocify-1-ricx.onrender.com";
 
 // Test backend connectivity
 const testBackend = async () => {
