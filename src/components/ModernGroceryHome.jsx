@@ -337,7 +337,7 @@ export default function ModernGroceryHome({ cart, setCart }) {
 
       {/* ================= FOOTER ================= */}
       <footer className="bg-gray-100 py-10 text-center text-gray-600">
-        © 2025 GrociFy. All rights reserved contact for any queries.
+        © 2025 GrociFy. All rights reserved contact phone no:885654962659 for any queries.
       </footer>
     </div>
   );
