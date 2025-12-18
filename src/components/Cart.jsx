@@ -1,9 +1,12 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Cart({cart,setCart}) {
-    const removeItem=(id)=>{
-        setCart(cart.filter(item=>item.id!==id));
+    const navigate = useNavigate();
+    
+    const removeItem = (index) => {
+        const newCart = cart.filter((_, i) => i !== index);
+        setCart(newCart);
     }
 
     const getTotalPrice = () => {
@@ -61,7 +64,7 @@ export default function Cart({cart,setCart}) {
                                         </div>
                                         <div className="text-center">
                                             <button 
-                                                onClick={() => removeItem(item.id)}
+                                                onClick={() => removeItem(index)}
                                                 className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl font-semibold hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-red-500/30"
                                                 title="Remove item"
                                             >
@@ -83,8 +86,11 @@ export default function Cart({cart,setCart}) {
                                         <span className="text-4xl font-extrabold text-gray-900 ml-2">{getTotalPrice()}</span>
                                     </div>
                                 </div>
-                                <button className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 px-6 rounded-2xl font-bold text-xl hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30">
-                                    💳 Proceed to Checkout
+                                <button 
+                                    onClick={() => navigate('/payment', { state: { totalAmount: getTotalPrice() } })}
+                                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 px-6 rounded-2xl font-bold text-xl hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30"
+                                >
+                                    💳 Proceed to Pay
                                 </button>
                             </div>
                         </div>

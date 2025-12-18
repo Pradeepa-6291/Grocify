@@ -39,6 +39,13 @@ const api = {
     return response.json();
   },
 
+  async deleteProduct(id) {
+    const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+      method: 'DELETE',
+    });
+    return response.json();
+  },
+
   // Users
   async registerUser(userData) {
     try {
