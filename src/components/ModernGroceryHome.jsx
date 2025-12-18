@@ -1,63 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { products } from '../utils/api';
 import homeImg from "../assets/home.png";
-
-/* ================= static top-sale items ================= */
-const TOP_SALES = [
-  {
-    id: "s1",
-    name: "Fresh Apples",
-    price: 120,
-    image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=400&fit=crop",
-    rating: 4.6,
-    offer: "20% OFF"
-  },
-  {
-    id: "s2",
-    name: "Organic Bananas",
-    price: 60,
-    image: "https://www.lovefoodhatewaste.com/sites/default/files/styles/twitter_card_image/public/2022-07/Bananas.jpg.webp?itok=zGHGTcmf",
-    rating: 4.5,
-    offer: "Best Seller"
-  },
-  {
-    id: "s3",
-    name: "Fresh Tomatoes",
-    price: 40,
-    image: "https://m.media-amazon.com/images/I/61ZJhcdG7LL.jpg",
-    rating: 4.4,
-    offer: "Hot Deal"
-  },
-  {
-    id: "s4",
-    name: "Milk 1L",
-    price: 55,
-    image: "https://unblast.com/wp-content/uploads/2018/11/Milk-Package-Mockup.jpg",
-    rating: 4.7,
-    offer: "New"
-  },
-  {
-    id: "s5",
-    name: "Brown Bread",
-    price: 45,
-    image: "https://www.bbassets.com/media/uploads/p/l/40092241_8-britannia-brown-bread-with-goodness-of-wheat-enriched-with-vitamins.jpg",
-    rating: 4.3,
-    offer: "Trending"
-  },
-  {
-    id: "s6",
-    name: "Farm Eggs (6)",
-    price: 70,
-    image: "https://www.farmoneforty.ca/wp-content/uploads/2016/04/IMG_20200329_114801.jpg",
-    rating: 4.8,
-    offer: "Top Rated"
-  }
-];
 
 export default function ModernGroceryHome({ cart, setCart }) {
   const navigate = useNavigate();
 
-  /* ================= USER SAFE PARSING ================= */
+  // ✅ SAFE USER PARSING (FIXED)
   let user = null;
   try {
     const storedUser = localStorage.getItem('user');
@@ -68,35 +17,12 @@ export default function ModernGroceryHome({ cart, setCart }) {
     user = null;
   }
 
-  /* ================= BACKEND PRODUCTS STATE (optional / not shown) ================= */
-  // You keep this if you want to fetch and show backend products later.
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  /* ================= FETCH BACKEND PRODUCTS (optional) ================= */
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/products`
-        );
-        const data = await res.json();
-        setProducts(data);
-      } catch (err) {
-        console.error("❌ Failed to fetch products", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-
-  /* ================= CART HANDLER ================= */
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
-  /* ================= CATEGORIES ================= */
+  const featuredProducts = products.slice(0, 6);
+
   const categories = [
     { name: 'Vegetables & Fruits', icon: '🥬', color: 'bg-green-50', slug: 'fruits' },
     { name: 'Beverages', icon: '☕', color: 'bg-amber-50', slug: 'beverages' },
@@ -111,7 +37,7 @@ export default function ModernGroceryHome({ cart, setCart }) {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ================= NAVBAR ================= */}
+      {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 bg-gradient-to-r from-emerald-600 to-green-500 shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
@@ -164,7 +90,7 @@ export default function ModernGroceryHome({ cart, setCart }) {
         </div>
       </nav>
 
-      {/* ================= HERO SECTION ================= */}
+      {/* HERO SECTION */}
       <section className="pt-28 pb-16 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 relative overflow-hidden">
         {/* Floating Elements */}
         <div className="absolute top-20 right-10 animate-float">
@@ -213,13 +139,13 @@ export default function ModernGroceryHome({ cart, setCart }) {
             <div className="inline-block bg-yellow-400 text-gray-900 px-4 py-2 rounded-full font-bold text-sm mb-6 animate-pulse">
               Opening Sale Discount 50%
             </div>
-
+            
             <h1 className="text-6xl font-black text-gray-900 mb-6 leading-tight">
               Fresh Food,<br />
               Fair Prices,<br />
               <span className="text-emerald-600">Fresh Grocery</span>
             </h1>
-
+            
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
               Fresh groceries delivered to your doorstep.<br />
               shopping and convenient home delivery.
@@ -250,7 +176,7 @@ export default function ModernGroceryHome({ cart, setCart }) {
         </div>
       </section>
 
-      {/* ================= CATEGORIES ================= */}
+      {/* CATEGORIES */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">Shop by Category</h2>
@@ -273,53 +199,38 @@ export default function ModernGroceryHome({ cart, setCart }) {
         </div>
       </section>
 
-      {/* ================= TOP SAVE TODAY (static) ================= */}
+      {/* PRODUCTS */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
-          {/* Header + CTA */}
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="text-4xl font-bold animate-fade-in">🔥 Top Save Today</h2>
-            <Link
-              to="/products"
-              className="text-emerald-600 font-semibold hover:underline animate-fade-in"
-            >
-              View All →
-            </Link>
-          </div>
+          <h2 className="text-4xl font-bold mb-12 animate-fade-in">Top Save Today</h2>
 
-          {/* Cards */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-6">
-            {TOP_SALES.map((product, index) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-xl shadow-md hover:shadow-2xl p-4 transition-all duration-300 transform hover:-translate-y-3 hover:scale-105 animate-fade-in-up"
+            {featuredProducts.map((product, index) => (
+              <div 
+                key={product.id} 
+                className="bg-white rounded-xl shadow-md hover:shadow-2xl p-4 transition-all duration-300 transform hover:-translate-y-3 hover:scale-105 cursor-pointer animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                {/* IMAGE */}
                 <div className="relative overflow-hidden rounded-lg mb-3 group">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-32 w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="h-32 w-full object-cover transition-transform duration-500 group-hover:scale-110" 
                   />
-                  {/* OFFER TAG */}
-                  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    {product.offer}
-                  </span>
+                  {product.offer && (
+                    <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      {product.offer}
+                    </span>
+                  )}
+                  <button
+                    onClick={() => navigate(`/delete-product/${product.id}`)}
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded-full transition-all duration-300 transform hover:scale-110 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100"
+                    title="Delete Product"
+                  >
+                    🗑️
+                  </button>
                 </div>
-
-                {/* NAME */}
-                <h3 className="font-semibold mt-1 text-sm line-clamp-2">{product.name}</h3>
-
-                {/* RATING */}
-                <div className="flex items-center gap-1 mt-1">
-                  <span className="text-yellow-400 text-xs">★★★★★</span>
-                  <span className="text-xs text-gray-500">
-                    ({product.rating})
-                  </span>
-                </div>
-
-                {/* PRICE + CART */}
+                <h3 className="font-semibold mt-3 text-sm line-clamp-2">{product.name}</h3>
                 <div className="flex justify-between items-center mt-3">
                   <span className="text-emerald-600 font-bold text-lg">₹{product.price}</span>
                   <button
@@ -335,10 +246,11 @@ export default function ModernGroceryHome({ cart, setCart }) {
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
+      {/* FOOTER */}
       <footer className="bg-gray-100 py-10 text-center text-gray-600">
-        © 2025 GrociFy. All rights reserved contact  for any queries.
+        © 2024 GrociFy. All rights reserved contact for any queries.
       </footer>
+
     </div>
   );
 }
