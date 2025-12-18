@@ -16,7 +16,7 @@ const TOP_SALES = [
     id: "s2",
     name: "Organic Bananas",
     price: 60,
-    image: "https://images.unsplash.com/photo-1574226516831-e1dff420e12a?w=400&h=400&fit=crop",
+    image: "https://www.lovefoodhatewaste.com/sites/default/files/styles/twitter_card_image/public/2022-07/Bananas.jpg.webp?itok=zGHGTcmf",
     rating: 4.5,
     offer: "Best Seller"
   },
@@ -24,7 +24,7 @@ const TOP_SALES = [
     id: "s3",
     name: "Fresh Tomatoes",
     price: 40,
-    image: "https://images.unsplash.com/photo-1546470427-e5ac89f06e34?w=400&h=400&fit=crop",
+    image: "https://m.media-amazon.com/images/I/61ZJhcdG7LL.jpg",
     rating: 4.4,
     offer: "Hot Deal"
   },
@@ -32,7 +32,7 @@ const TOP_SALES = [
     id: "s4",
     name: "Milk 1L",
     price: 55,
-    image: "https://images.unsplash.com/photo-1580910051074-7f24ec8c6c07?w=400&h=400&fit=crop",
+    image: "https://unblast.com/wp-content/uploads/2018/11/Milk-Package-Mockup.jpg",
     rating: 4.7,
     offer: "New"
   },
@@ -40,7 +40,7 @@ const TOP_SALES = [
     id: "s5",
     name: "Brown Bread",
     price: 45,
-    image: "https://images.unsplash.com/photo-1608198093002-de8c1c5bb7f1?w=400&h=400&fit=crop",
+    image: "https://www.bbassets.com/media/uploads/p/l/40092241_8-britannia-brown-bread-with-goodness-of-wheat-enriched-with-vitamins.jpg",
     rating: 4.3,
     offer: "Trending"
   },
@@ -48,7 +48,7 @@ const TOP_SALES = [
     id: "s6",
     name: "Farm Eggs (6)",
     price: 70,
-    image: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400&h=400&fit=crop",
+    image: "https://www.farmoneforty.ca/wp-content/uploads/2016/04/IMG_20200329_114801.jpg",
     rating: 4.8,
     offer: "Top Rated"
   }
