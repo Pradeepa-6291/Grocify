@@ -1,87 +1,81 @@
-const API_BASE_URL = "http://grocify-1-ricx.onrender.com";
-
-// Test backend connectivity
-const testBackend = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/test`);
-    const data = await response.json();
-    console.log("✅ Backend test:", data);
-    return true;
-  } catch (error) {
-    console.error("❌ Backend connection failed:", error);
-    return false;
-  }
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = {
-  testConnection: testBackend,
+  // 🔍 Test backend
+  async testConnection() {
+    const res = await fetch(`${API_BASE_URL}/api/test`);
+    if (!res.ok) throw new Error("Backend not reachable");
+    return res.json();
+  },
 
-  // ✅ PRODUCTS
+  // 🛒 PRODUCTS
   async getProducts() {
-    const response = await fetch(`${API_BASE_URL}/api/products`);
-    return response.json();
+    const res = await fetch(`${API_BASE_URL}/api/products`);
+    if (!res.ok) throw new Error("Failed to fetch products");
+    return res.json();
   },
 
   async getProductById(id) {
-    const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
-    return response.json();
+    const res = await fetch(`${API_BASE_URL}/api/products/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch product");
+    return res.json();
   },
 
-  async createProduct(productData) {
-    const response = await fetch(`${API_BASE_URL}/api/products`, {
+  async createProduct(data) {
+    const res = await fetch(`${API_BASE_URL}/api/products`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(productData),
+      body: JSON.stringify(data),
     });
-    return response.json();
+    if (!res.ok) throw new Error("Failed to create product");
+    return res.json();
   },
 
   async deleteProduct(id) {
-    const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
       method: "DELETE",
     });
-    return response.json();
+    if (!res.ok) throw new Error("Failed to delete product");
+    return res.json();
   },
 
-  // ✅ USERS
-  async registerUser(userData) {
-    const response = await fetch(`${API_BASE_URL}/api/users/register`, {
+  // 👤 USERS
+  async registerUser(data) {
+    const res = await fetch(`${API_BASE_URL}/api/users/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
+      body: JSON.stringify(data),
     });
-    return response.json();
+    return res.json();
   },
 
-  async loginUser(credentials) {
-    const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+  async loginUser(data) {
+    const res = await fetch(`${API_BASE_URL}/api/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(credentials),
+      body: JSON.stringify(data),
     });
-    return response.json();
+    return res.json();
   },
 
-  // ✅ ORDERS
-  async createOrder(orderData, token) {
-    const response = await fetch(`${API_BASE_URL}/api/orders`, {
+  // 📦 ORDERS
+  async createOrder(order, token) {
+    const res = await fetch(`${API_BASE_URL}/api/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(orderData),
+      body: JSON.stringify(order),
     });
-    return response.json();
+    return res.json();
   },
 
   async getUserOrders(token) {
-    const response = await fetch(`${API_BASE_URL}/api/orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const res = await fetch(`${API_BASE_URL}/api/orders`, {
+      headers: { Authorization: `Bearer ${token}` },
     });
-    return response.json();
+    return res.json();
   },
 };
 
